@@ -81,7 +81,7 @@ Run the make_deb command after compiling the plugin:
 
   $ ./make_deb help
   make_deb {x86|arm} [help|clean|cleanall]
-  This script is used to create the Debian package of FoglAMP C++ 'scale' filter plugin
+  This script is used to create the Debian package of FoglAMP C++ 'rms' filter plugin
   Arguments:
    help     - Display this help text
    x86      - Build an x86_64 package
@@ -98,15 +98,15 @@ Finally, run the ``make_deb`` command:
 .. code-block:: console
 
    $ ./make_deb
-   The package root directory is   : /home/ubuntu/source/foglamp-filter-scale
+   The package root directory is   : /home/ubuntu/source/foglamp-filter-rms
    The FogLAMP required version    : >=1.4
-   The package will be built in    : /home/ubuntu/source/foglamp-filter-scale/packages/build
+   The package will be built in    : /home/ubuntu/source/foglamp-filter-rms/packages/build
    The architecture is set as      : x86_64
-   The package name is             : foglamp-filter-scale-1.0.0-x86_64
+   The package name is             : foglamp-filter-rms-1.0.0-x86_64
 
    Populating the package and updating version file...Done.
    Building the new package...
-   dpkg-deb: building package 'foglamp-filter-scale' in 'foglamp-filter-scale-1.0.0-x86_64.deb'.
+   dpkg-deb: building package 'foglamp-filter-rms' in 'foglamp-filter-rms-1.0.0-x86_64.deb'.
    Building Complete.
    $
 
