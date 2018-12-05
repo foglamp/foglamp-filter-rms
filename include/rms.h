@@ -22,9 +22,9 @@ class RMSFilter : public FogLampFilter {
 		{
 			m_sampleSize = size;
 		};
-		void	addValue(const std::string& name, long value);
-		void	addValue(const std::string& name, double value);
-		void	outputData(ReadingSet *);
+		void	addValue(const std::string& asset, const std::string& dpname, long value);
+		void	addValue(const std::string& asset, const std::string& dpname, double value);
+		void	outputData(ReadingSet&);
 		bool	sendRawData();
 	private:
 		class RMSData {
@@ -32,12 +32,15 @@ class RMSFilter : public FogLampFilter {
 				RMSData() : samples(0), cumulative(0.0)
 				{
 				};
-				unsigned int samples;
-				double	      cumulative;
+				unsigned int 	samples;
+				double	      	cumulative;
+				double		peak_max;
+				double		peak_min;
 		};
 		unsigned int	m_sampleSize;
 		bool		m_sendRawData;
+		bool		m_sendPeak;
 		std::string	m_assetName;
-		std::map<std::string, RMSData *>
+		std::map<std::pair<std::string, std::string>, RMSData *>
 				m_values;
 };

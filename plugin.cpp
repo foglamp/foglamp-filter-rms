@@ -29,9 +29,12 @@
 			 "\"rawData\": {\"description\": \"Switch to control the inclusion of the raw data in the output\", " \
 				"\"type\": \"boolean\", " \
 				"\"default\": \"false\" }, " \
+			 "\"peak\": {\"description\": \"Include peak to peak values in readings\", " \
+				"\"type\": \"boolean\", " \
+				"\"default\": \"false\" }, " \
 			 "\"assetName\": {\"description\": \"Name of the output asset for the RMS data\", " \
 				"\"type\": \"string\", " \
-				"\"default\": \"RMS\" }, " \
+				"\"default\": \"%%a RMS\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the RMS filter.\", " \
 				"\"type\": \"boolean\", " \
@@ -111,21 +114,18 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 		return;
 	}
 
-	// 1- We might need to transform the input readings set: example
-	// ReadingSet* newReadings = scale_readings(scaleFactor, readingSet);
-
 	// Just get all the readings in the readingset
-	const vector<Reading *>& readings = ((ReadingSet *)readingSet)->getAllReadings();
+	const vector<Reading *>& readings = readingSet->getAllReadings();
 
-	ReadingSet *rmsReadings = new ReadingSet();
-	// Iterate the readings
+	ReadingSet rmsReadings;
+	// Iterate over the readings
 	for (vector<Reading *>::const_iterator elem = readings.begin();
 						      elem != readings.end();
 						      ++elem)
 	{
-		// Get a reading DataPoint
+		const string& asset = (*elem)->getAssetName();
+		// Iterate over the datapoints
 		const vector<Datapoint *>& dataPoints = (*elem)->getReadingData();
-		// Iterate the datapoints
 		for (vector<Datapoint *>::const_iterator it = dataPoints.cbegin(); it != dataPoints.cend(); ++it)
 		{
 			// Get the reference to a DataPointValue
@@ -134,11 +134,11 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 			// If INTEGER or FLOAT do the change
 			if (value.getType() == DatapointValue::T_INTEGER)
 			{
-				filter->addValue((*it)->getName(), value.toInt());
+				filter->addValue(asset, (*it)->getName(), value.toInt());
 			}
 			else if (value.getType() == DatapointValue::T_FLOAT)
 			{
-				filter->addValue((*it)->getName(), value.toDouble());
+				filter->addValue(asset, (*it)->getName(), value.toDouble());
 			}
 			else
 			{
@@ -150,22 +150,21 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 
 	if (filter->sendRawData())
 	{
-		if (rmsReadings->getCount())
+		if (rmsReadings.getCount())
 		{
-			ReadingSet *rs = (ReadingSet *)readingSet;
-			rs->append(rmsReadings);
+			readingSet->append(rmsReadings);
 		}
 		filter->m_func(filter->m_data, readingSet);
 	}
 	else
 	{
-		delete (ReadingSet *)readingSet;
-		if (rmsReadings->getCount())
+		readingSet->removeAll();
+		if (rmsReadings.getCount())
 		{
-			filter->m_func(filter->m_data, rmsReadings);
+			readingSet->append(rmsReadings);
+			filter->m_func(filter->m_data, readingSet);
 		}
 	}
-	delete rmsReadings;
 }
 
 /**

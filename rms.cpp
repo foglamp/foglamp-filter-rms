@@ -57,12 +57,20 @@ RMSFilter::RMSFilter(const std::string& filterName,
 	}
 	if (filterConfig.itemExists("rawData"))
 	{
-		m_sendRawData = *(filterConfig.getValue("rawData").c_str()) == 't' ? true : false;
+		m_sendRawData = filterConfig.getValue("rawData").compare("true") == 0 ? true : false;
 	}
 	else
 	{
 		m_sendRawData = false;
 	}
+	if (filterConfig.itemExists("peak"))
+	{
+		m_sendPeak = filterConfig.getValue("peak").compare("true") == 0 ? true : false;
+	}
+	else
+	{
+		m_sendPeak = false;
+	}
 }
 
 /**
@@ -71,11 +79,11 @@ RMSFilter::RMSFilter(const std::string& filterName,
  * @param value	The value to add
  */
 void
-RMSFilter::addValue(const string& name, long value)
+RMSFilter::addValue(const string& asset, const string& dpname, long value)
 {
 double	dvalue = (double)value;
 
-	addValue(name, dvalue);
+	addValue(asset, dpname, dvalue);
 }
 
 /**
@@ -84,17 +92,24 @@ double	dvalue = (double)value;
  * @param value	The value to add
  */
 void
-RMSFilter::addValue(const string& name, double value)
+RMSFilter::addValue(const string& asset, const string& dpname, double value)
 {
-map<std::string, RMSData *>::iterator it;
+map<pair<string, string>, RMSData *>::iterator it;
+pair<string, string>	key = make_pair(asset, dpname);
 
-	if ((it = m_values.find(name)) == m_values.end())
+	if ((it = m_values.find(key)) == m_values.end())
 	{
-		m_values.insert(pair<string, RMSData *>(name, new RMSData));
-		it = m_values.find(name);
+		m_values.insert(pair<pair<string, string>, RMSData *>(key, new RMSData));
+		it = m_values.find(key);
+		it->second->peak_max = value;
+		it->second->peak_min = value;
 	}
-	it->second->samples++;
 	it->second->cumulative += (value * value);
+	if (it->second->samples == 0 || it->second->peak_max < value)
+		it->second->peak_max = value;
+	if (it->second->samples == 0 || it->second->peak_min > value)
+		it->second->peak_min = value;
+	it->second->samples++;
 }
 
 /**
@@ -109,9 +124,10 @@ map<std::string, RMSData *>::iterator it;
  * @param readingSet	A reading set to which any RMS values are appened
  */
 void
-RMSFilter::outputData(ReadingSet *readingSet)
+RMSFilter::outputData(ReadingSet& readingSet)
 {
 vector<Datapoint *>	dataPoints;
+map<string, Reading *>	readings;
 
 	for (auto it = m_values.cbegin(); it != m_values.cend(); it++)
 	{
@@ -122,16 +138,43 @@ vector<Datapoint *>	dataPoints;
 			it->second->cumulative = 0.0;
 			it->second->samples = 0;
 			DatapointValue	dpv(value);
-			dataPoints.push_back(new Datapoint(it->first, dpv));
+			DatapointValue  peak(it->second->peak_max - it->second->peak_min);
+
+			string assetName = m_assetName;
+			if (assetName.find("%%a") != string::npos)
+			{
+				assetName.replace(assetName.find("%%a"), 2, it->first.first);
+			}
+			
+			map<string, Reading *>::iterator ait = readings.find(it->first.first);
+			if (ait != readings.end())
+			{
+				ait->second->addDatapoint(new Datapoint(it->first.second, dpv));
+				if (m_sendPeak)
+				{
+					ait->second->addDatapoint(new Datapoint(it->first.second + "peak", peak));
+				}
+			}
+			else
+			{
+				Reading *tmpReading = new Reading(assetName, new Datapoint(it->first.second, dpv));
+				tmpReading->addDatapoint(new Datapoint(it->first.second + "peak", peak));
+				if (m_sendPeak)
+				{
+					readings.insert(pair<string, Reading *>(it->first.first, tmpReading));
+				}
+			}
 		}
 	}
-	if (dataPoints.size() > 0)
+
+	vector<Reading *> readingVec;
+	for (auto it = readings.cbegin(); it != readings.cend(); it++)
 	{
-		// At least one RMS datapoint was created
-		vector<Reading *> readingVec;
-		readingVec.push_back(new Reading(m_assetName, dataPoints));
-		readingSet->append(readingVec);
-		
+		readingVec.push_back(it->second);
+	}
+	if (readingVec.size() > 0)
+	{
+		readingSet.append(readingVec);
 	}
 }
 
