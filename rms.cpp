@@ -76,6 +76,7 @@ RMSFilter::RMSFilter(const std::string& filterName,
 /**
  * Add a sample value to the RMS cumulative values
  * @param name	The name of the value, i.e. the datapoint
+ * @param dpname The name of the data point
  * @param value	The value to add
  */
 void
@@ -89,6 +90,7 @@ double	dvalue = (double)value;
 /**
  * Add a sample value to the RMS cumulative values
  * @param name	The name of the value, i.e. the datapoint
+ * @param dpname The name of the data point
  * @param value	The value to add
  */
 void
@@ -141,6 +143,10 @@ map<string, Reading *>	readings;
 			DatapointValue  peak(it->second->peak_max - it->second->peak_min);
 
 			string assetName = m_assetName;
+			/*
+			 * Check for a %a in the new name and substitute with
+			 * the asset name
+			 */
 			if (assetName.find("%%a") != string::npos)
 			{
 				assetName.replace(assetName.find("%%a"), 2, it->first.first);
