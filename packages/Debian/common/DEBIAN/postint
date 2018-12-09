@@ -28,7 +28,7 @@
 set -e
 
 set_files_ownership () {
-    chown -R root:root /usr/local/foglamp/plugins/filter/scale
+    chown -R root:root /usr/local/foglamp/plugins/filter/rms
 }
 
 set_files_ownership
