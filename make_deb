@@ -22,7 +22,7 @@
 set -e
 
 plugin_type="filter"
-plugin_name="scale"
+plugin_name="rms"
 plugin_install_dirname=${plugin_name}
 usage="$(basename "$0") {x86|arm} [help|clean|cleanall]
 This script is used to create the Debian package of FoglAMP C++ '${plugin_name}' ${plugin_type} plugin
