@@ -114,58 +114,14 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 		return;
 	}
 
-	// Just get all the readings in the readingset
-	const vector<Reading *>& readings = readingSet->getAllReadings();
+	vector<Reading *>out;
+	filter->ingest(readingSet->getAllReadingsPtr(), out);
+	delete (ReadingSet *)readingSet;
 
-	ReadingSet rmsReadings;
-	// Iterate over the readings
-	for (vector<Reading *>::const_iterator elem = readings.begin();
-						      elem != readings.end();
-						      ++elem)
-	{
-		const string& asset = (*elem)->getAssetName();
-		// Iterate over the datapoints
-		const vector<Datapoint *>& dataPoints = (*elem)->getReadingData();
-		for (vector<Datapoint *>::const_iterator it = dataPoints.cbegin(); it != dataPoints.cend(); ++it)
-		{
-			// Get the reference to a DataPointValue
-			DatapointValue& value = (*it)->getData();
-
-			// If INTEGER or FLOAT do the change
-			if (value.getType() == DatapointValue::T_INTEGER)
-			{
-				filter->addValue(asset, (*it)->getName(), value.toInt());
-			}
-			else if (value.getType() == DatapointValue::T_FLOAT)
-			{
-				filter->addValue(asset, (*it)->getName(), value.toDouble());
-			}
-			else
-			{
-				// do nothing
-			}
-		}
-		filter->outputData(rmsReadings);
-	}
-
-	if (filter->sendRawData())
-	{
-		if (rmsReadings.getCount())
-		{
-			readingSet->append(rmsReadings);
-		}
-		filter->m_func(filter->m_data, readingSet);
-	}
-	else
-	{
-		readingSet->removeAll();
-		if (rmsReadings.getCount())
-		{
-			readingSet->append(rmsReadings);
-			filter->m_func(filter->m_data, readingSet);
-		}
-	}
+	ReadingSet *newReadingSet = new ReadingSet(&out);
+	filter->m_func(filter->m_data, newReadingSet);
 }
+
 
 /**
  * Call the shutdown method in the plugin
