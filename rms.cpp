@@ -74,6 +74,55 @@ RMSFilter::RMSFilter(const std::string& filterName,
 }
 
 /**
+ * Ingest data into the plugin and write the processed data to the out vector
+ *
+ * @param readings	The readings to process
+ * @param out		The output readings vector
+ */
+void
+RMSFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
+{
+	// Iterate over the readings
+	for (vector<Reading *>::const_iterator elem = readings->begin();
+						      elem != readings->end();
+						      ++elem)
+	{
+		const string& asset = (*elem)->getAssetName();
+		// Iterate over the datapoints
+		const vector<Datapoint *>& dataPoints = (*elem)->getReadingData();
+		for (vector<Datapoint *>::const_iterator it = dataPoints.cbegin(); it != dataPoints.cend(); ++it)
+		{
+			// Get the reference to a DataPointValue
+			DatapointValue& value = (*it)->getData();
+
+			// If INTEGER or FLOAT do the change
+			if (value.getType() == DatapointValue::T_INTEGER)
+			{
+				addValue(asset, (*it)->getName(), value.toInt());
+			}
+			else if (value.getType() == DatapointValue::T_FLOAT)
+			{
+				addValue(asset, (*it)->getName(), value.toDouble());
+			}
+			else
+			{
+				// do nothing
+			}
+		}
+		if (sendRawData())
+		{
+			out.push_back(*elem);
+		}
+		else
+		{
+			delete *elem;
+		}
+		outputData(out);
+	}
+	readings->clear();	// Prevent double deletes
+}
+
+/**
  * Add a sample value to the RMS cumulative values
  * @param name	The name of the value, i.e. the datapoint
  * @param dpname The name of the data point
@@ -126,7 +175,7 @@ pair<string, string>	key = make_pair(asset, dpname);
  * @param readingSet	A reading set to which any RMS values are appened
  */
 void
-RMSFilter::outputData(ReadingSet& readingSet)
+RMSFilter::outputData(vector<Reading *>& out)
 {
 vector<Datapoint *>	dataPoints;
 map<string, Reading *>	readings;
@@ -164,23 +213,18 @@ map<string, Reading *>	readings;
 			else
 			{
 				Reading *tmpReading = new Reading(assetName, new Datapoint(it->first.second, dpv));
-				tmpReading->addDatapoint(new Datapoint(it->first.second + "peak", peak));
 				if (m_sendPeak)
 				{
-					readings.insert(pair<string, Reading *>(it->first.first, tmpReading));
+					tmpReading->addDatapoint(new Datapoint(it->first.second + "peak", peak));
 				}
+				readings.insert(pair<string, Reading *>(it->first.first, tmpReading));
 			}
 		}
 	}
 
-	vector<Reading *> readingVec;
 	for (auto it = readings.cbegin(); it != readings.cend(); it++)
 	{
-		readingVec.push_back(it->second);
-	}
-	if (readingVec.size() > 0)
-	{
-		readingSet.append(readingVec);
+		out.push_back(it->second);
 	}
 }
 

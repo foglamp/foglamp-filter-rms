@@ -22,11 +22,12 @@ class RMSFilter : public FogLampFilter {
 		{
 			m_sampleSize = size;
 		};
+		void	ingest(std::vector<Reading *> *in, std::vector<Reading *>& out);
+	private:
 		void	addValue(const std::string& asset, const std::string& dpname, long value);
 		void	addValue(const std::string& asset, const std::string& dpname, double value);
-		void	outputData(ReadingSet&);
+		void	outputData(std::vector<Reading *>&);
 		bool	sendRawData();
-	private:
 		class RMSData {
 			public:
 				RMSData() : samples(0), cumulative(0.0)
