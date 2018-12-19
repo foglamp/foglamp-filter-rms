@@ -237,3 +237,46 @@ RMSFilter::sendRawData()
 {
 	return m_sendRawData;
 }
+
+/**
+ * Reconfigure the RMS filter
+ *
+ * @param newConfig	The new configuration
+ */
+void
+RMSFilter::reconfigure(const string& newConfig)
+{
+	setConfig(newConfig);
+	if (m_config.itemExists("asset"))
+	{
+		m_assetName = m_config.getValue("asset");
+	}
+	else
+	{
+		m_assetName = "RMS";
+	}
+	if (m_config.itemExists("samples"))
+	{
+		m_sampleSize = strtol(m_config.getValue("samples").c_str(), NULL, 10);
+	}
+	else
+	{
+		m_sampleSize = 10;
+	}
+	if (m_config.itemExists("rawData"))
+	{
+		m_sendRawData = m_config.getValue("rawData").compare("true") == 0 ? true : false;
+	}
+	else
+	{
+		m_sendRawData = false;
+	}
+	if (m_config.itemExists("peak"))
+	{
+		m_sendPeak = m_config.getValue("peak").compare("true") == 0 ? true : false;
+	}
+	else
+	{
+		m_sendPeak = false;
+	}
+}

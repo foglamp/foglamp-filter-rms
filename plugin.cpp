@@ -122,6 +122,17 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 	filter->m_func(filter->m_data, newReadingSet);
 }
 
+/**
+ * Reconfigure the plugin
+ *
+ * @param handle	The plugin handle
+ * @param bewConfig	The new configuration
+ */
+void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
+{
+	RMSFilter *data = (RMSFilter *)handle;
+	data->reconfigure(newConfig);
+}
 
 /**
  * Call the shutdown method in the plugin
