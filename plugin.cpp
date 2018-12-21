@@ -40,7 +40,7 @@
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the RMS filter.\", " \
 				"\"type\": \"boolean\", " \
-				"\"displayName\": \"Enable\", " \
+				"\"displayName\": \"Enabled\", " \
 				"\"default\": \"false\" }, " \
 			"\"samples\" : {\"description\" : \"Number of samples per calculation.\", " \
 				"\"type\": \"integer\", " \
