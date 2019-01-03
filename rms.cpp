@@ -39,9 +39,9 @@ RMSFilter::RMSFilter(const std::string& filterName,
 				FogLampFilter(filterName, filterConfig,
 						outHandle, out)
 {
-	if (filterConfig.itemExists("asset"))
+	if (filterConfig.itemExists("assetName"))
 	{
-		m_assetName = filterConfig.getValue("asset");
+		m_assetName = filterConfig.getValue("assetName");
 	}
 	else
 	{
@@ -198,9 +198,9 @@ map<string, Reading *>	readings;
 			 */
 			if (assetName.find("%%a") != string::npos)
 			{
-				assetName.replace(assetName.find("%%a"), 2, it->first.first);
+				assetName.replace(assetName.find("%%a"), 3, it->first.first);
 			}
-			
+
 			map<string, Reading *>::iterator ait = readings.find(it->first.first);
 			if (ait != readings.end())
 			{

@@ -23,7 +23,7 @@ To build FogLAMP "RMS" C++ filter plugin:
   FOGLAMP_ROOT directory.
   Please note that you must first run 'make' in the FOGLAMP_ROOT directory.
 
-You may also pass one or more of the following options to cmake to override 
+You may also pass one or more of the following options to cmake to override
 this default behaviour:
 
 - **FOGLAMP_SRC** sets the path of a FogLAMP source tree
@@ -32,7 +32,7 @@ this default behaviour:
 - **FOGLAMP_INSTALL** sets the installation path of Random plugin
 
 NOTE:
- - The **FOGLAMP_INCLUDE** option should point to a location where all the FogLAMP 
+ - The **FOGLAMP_INCLUDE** option should point to a location where all the FogLAMP
    header files have been installed in a single directory.
  - The **FOGLAMP_LIB** option should point to a location where all the FogLAMP
    libraries have been installed in a single directory.
@@ -122,6 +122,6 @@ A number of configuration options exist
 
 samples - The number of data samples to perform a calcuation over
 
-assetName - The asset name to use to output the RMS values
+assetName - The asset name to use to output the RMS values. "%%a" will be replaced with the original asset name.
 
 rawData - switch to include the raw input data in the output
