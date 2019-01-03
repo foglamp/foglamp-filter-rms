@@ -23,25 +23,29 @@
 
 #define FILTER_NAME "rms"
 #define SAMPLE_SIZE "10"
-#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"RMS filter plugin\", " \
+#define DEFAULT_CONFIG "{\"plugin\" : { \"description\" : \"Calculate RMS & Peak values over a set of samples\", " \
                        		"\"type\" : \"string\", " \
-				"\"default\" : \"" FILTER_NAME "\" }, " \
+				"\"default\" : \"" FILTER_NAME "\", \"readonly\" : \"true\" }, " \
 			 "\"rawData\": {\"description\": \"Switch to control the inclusion of the raw data in the output\", " \
 				"\"type\": \"boolean\", " \
-				"\"default\": \"false\" }, " \
+				"\"default\": \"false\", " \
+				"\"order\" : \"4\", \"displayName\": \"Include Raw Data\" }, " \
 			 "\"peak\": {\"description\": \"Include peak to peak values in readings\", " \
 				"\"type\": \"boolean\", " \
-				"\"default\": \"false\" }, " \
+				"\"default\": \"false\", " \
+				"\"order\" : \"3\", \"displayName\": \"Include Peak Values\" }, " \
 			 "\"assetName\": {\"description\": \"Name of the output asset for the RMS data\", " \
 				"\"type\": \"string\", " \
-				"\"default\": \"%%a RMS\" }, " \
+				"\"default\": \"%%a RMS\", \"order\": \"2\", \"displayName\": \"RMS Asset name\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the RMS filter.\", " \
 				"\"type\": \"boolean\", " \
+				"\"displayName\": \"Enabled\", " \
 				"\"default\": \"false\" }, " \
 			"\"samples\" : {\"description\" : \"Number of samples per calculation.\", " \
 				"\"type\": \"integer\", " \
-				"\"default\": \"" SAMPLE_SIZE "\"} }"
+				"\"default\": \"" SAMPLE_SIZE "\", \"order\" : \"1\", " \
+				"\"displayName\" : \" Sample size\"} }"
 using namespace std;
 
 /**
