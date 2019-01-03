@@ -23,6 +23,7 @@ class RMSFilter : public FogLampFilter {
 			m_sampleSize = size;
 		};
 		void	ingest(std::vector<Reading *> *in, std::vector<Reading *>& out);
+		void	reconfigure(const std::string& newConfig);
 	private:
 		void	addValue(const std::string& asset, const std::string& dpname, long value);
 		void	addValue(const std::string& asset, const std::string& dpname, double value);
