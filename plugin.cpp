@@ -36,7 +36,7 @@
 				"\"order\" : \"3\", \"displayName\": \"Include Peak Values\" }, " \
 			 "\"assetName\": {\"description\": \"Name of the output asset for the RMS data\", " \
 				"\"type\": \"string\", " \
-				"\"default\": \"%%a RMS\", \"order\": \"2\", \"displayName\": \"RMS Asset name\" }, " \
+				"\"default\": \"%a RMS\", \"order\": \"2\", \"displayName\": \"RMS Asset name\" }, " \
 			 "\"enable\": {\"description\": \"A switch that can be used to enable or disable execution of " \
 					 "the RMS filter.\", " \
 				"\"type\": \"boolean\", " \

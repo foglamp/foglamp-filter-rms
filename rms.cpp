@@ -196,9 +196,9 @@ map<string, Reading *>	readings;
 			 * Check for a %a in the new name and substitute with
 			 * the asset name
 			 */
-			if (assetName.find("%%a") != string::npos)
+			if (assetName.find("%a") != string::npos)
 			{
-				assetName.replace(assetName.find("%%a"), 3, it->first.first);
+				assetName.replace(assetName.find("%a"), 2, it->first.first);
 			}
 
 			map<string, Reading *>::iterator ait = readings.find(it->first.first);
@@ -247,9 +247,9 @@ void
 RMSFilter::reconfigure(const string& newConfig)
 {
 	setConfig(newConfig);
-	if (m_config.itemExists("asset"))
+	if (m_config.itemExists("assetName"))
 	{
-		m_assetName = m_config.getValue("asset");
+		m_assetName = m_config.getValue("assetName");
 	}
 	else
 	{

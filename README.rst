@@ -122,6 +122,6 @@ A number of configuration options exist
 
 samples - The number of data samples to perform a calcuation over
 
-assetName - The asset name to use to output the RMS values. "%%a" will be replaced with the original asset name.
+assetName - The asset name to use to output the RMS values. "%a" will be replaced with the original asset name.
 
 rawData - switch to include the raw input data in the output
