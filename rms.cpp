@@ -12,6 +12,7 @@
 #include <utility>
 #include <logger.h>
 #include <rms.h>
+#include <regex>
 
 using namespace std;
 
@@ -46,6 +47,14 @@ RMSFilter::RMSFilter(const std::string& filterName,
 	else
 	{
 		m_assetName = "RMS";
+	}
+	if (filterConfig.itemExists("match"))
+	{
+		m_assetFilter = filterConfig.getValue("match");
+	}
+	else
+	{
+		m_assetFilter = ".*";
 	}
 	if (filterConfig.itemExists("samples"))
 	{
@@ -82,44 +91,61 @@ RMSFilter::RMSFilter(const std::string& filterName,
 void
 RMSFilter::ingest(vector<Reading *> *readings, vector<Reading *>& out)
 {
+regex	*re = 0;
+
+	if (m_assetFilter.compare(".*"))
+	{
+		re = new regex(m_assetFilter);
+	}
 	// Iterate over the readings
 	for (vector<Reading *>::const_iterator elem = readings->begin();
 						      elem != readings->end();
 						      ++elem)
 	{
 		const string& asset = (*elem)->getAssetName();
-		// Iterate over the datapoints
-		const vector<Datapoint *>& dataPoints = (*elem)->getReadingData();
-		for (vector<Datapoint *>::const_iterator it = dataPoints.cbegin(); it != dataPoints.cend(); ++it)
+		if (re && regex_match(asset, *re) == false)
 		{
-			// Get the reference to a DataPointValue
-			DatapointValue& value = (*it)->getData();
-
-			// If INTEGER or FLOAT do the change
-			if (value.getType() == DatapointValue::T_INTEGER)
-			{
-				addValue(asset, (*it)->getName(), value.toInt());
-			}
-			else if (value.getType() == DatapointValue::T_FLOAT)
-			{
-				addValue(asset, (*it)->getName(), value.toDouble());
-			}
-			else
-			{
-				// do nothing
-			}
-		}
-		if (sendRawData())
-		{
+			// Does not match, pass through
 			out.push_back(*elem);
 		}
 		else
 		{
-			delete *elem;
+			// Iterate over the datapoints
+			const vector<Datapoint *>& dataPoints = (*elem)->getReadingData();
+			for (vector<Datapoint *>::const_iterator it = dataPoints.cbegin(); it != dataPoints.cend(); ++it)
+			{
+				// Get the reference to a DataPointValue
+				DatapointValue& value = (*it)->getData();
+
+				// If INTEGER or FLOAT do the change
+				if (value.getType() == DatapointValue::T_INTEGER)
+				{
+					addValue(asset, (*it)->getName(), value.toInt());
+				}
+				else if (value.getType() == DatapointValue::T_FLOAT)
+				{
+					addValue(asset, (*it)->getName(), value.toDouble());
+				}
+				else
+				{
+					// do nothing
+				}
+			}
+			if (sendRawData())
+			{
+				out.push_back(*elem);
+			}
+			else
+			{
+				delete *elem;
+			}
 		}
 		outputData(out);
 	}
 	readings->clear();	// Prevent double deletes
+
+	if (re)
+		delete re;
 }
 
 /**
@@ -254,6 +280,14 @@ RMSFilter::reconfigure(const string& newConfig)
 	else
 	{
 		m_assetName = "RMS";
+	}
+	if (m_config.itemExists("match"))
+	{
+		m_assetFilter = m_config.getValue("match");
+	}
+	else
+	{
+		m_assetFilter = ".*";
 	}
 	if (m_config.itemExists("samples"))
 	{

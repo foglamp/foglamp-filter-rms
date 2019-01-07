@@ -45,7 +45,11 @@
 			"\"samples\" : {\"description\" : \"Number of samples per calculation.\", " \
 				"\"type\": \"integer\", " \
 				"\"default\": \"" SAMPLE_SIZE "\", \"order\" : \"1\", " \
-				"\"displayName\" : \" Sample size\"} }"
+				"\"displayName\" : \" Sample size\"}, " \
+			 "\"match\": {\"description\": \"An optional regular expression to match in the asset name\", " \
+				"\"type\": \"string\", " \
+				"\"default\": \".*\", \"order\": \"5\", \"displayName\": \"Asset filter\" } " \
+			" }"
 using namespace std;
 
 /**
