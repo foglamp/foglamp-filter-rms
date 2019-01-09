@@ -10,7 +10,11 @@ period as the RMS value is calculated.
 Note, peak values may be less than individual values of the input if the
 asset value does not fall to or below zero. Where a data value swings
 between negative and positive values then the peak value will be greater
-than the maximum value in the data stream.
+than the maximum value in the data stream. For example if the minimum value
+of a data point in the sample set is 0.3 and the maximum is 3.4 then the peak
+value will be 3.1. If the maximum value is 2.4 and the minimum is zero then
+the peak will be 2.4. If the maximum value is 1.7 and the minimum is -0.5
+then the peak value will be 2.2.
 
 The user may also choose to include or not the raw data that is used to
 calculate the RMS values via a switch in the configuration.
