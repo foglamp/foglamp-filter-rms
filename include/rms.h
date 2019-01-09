@@ -11,6 +11,7 @@
 #include <reading_set.h>
 #include <string>
 #include <map>
+#include <regex>
 
 class RMSFilter : public FogLampFilter {
 	public:
@@ -43,6 +44,7 @@ class RMSFilter : public FogLampFilter {
 		bool		m_sendRawData;
 		bool		m_sendPeak;
 		std::string	m_assetName;
+		std::string	m_assetFilter;
 		std::map<std::pair<std::string, std::string>, RMSData *>
 				m_values;
 };
