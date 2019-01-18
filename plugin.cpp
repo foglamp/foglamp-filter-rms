@@ -69,6 +69,12 @@ static PLUGIN_INFORMATION info = {
 	DEFAULT_CONFIG	          // Default plugin configuration
 };
 
+typedef struct
+{
+	RMSFilter	*handle;
+	std::string	configCatName;
+} FILTER_INFO;
+
 /**
  * Return the information about this plugin
  */
@@ -97,12 +103,14 @@ PLUGIN_HANDLE plugin_init(ConfigCategory* config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output)
 {
-	RMSFilter *handle = new RMSFilter(FILTER_NAME,
-						  *config,
-						  outHandle,
-						  output);
+	FILTER_INFO *info = new FILTER_INFO;
+	info->handle = new RMSFilter(FILTER_NAME,
+					*config,
+					outHandle,
+					output);
+	info->configCatName = config->getName();
 
-	return (PLUGIN_HANDLE)handle;
+	return (PLUGIN_HANDLE)info;
 }
 
 /**
@@ -114,7 +122,8 @@ PLUGIN_HANDLE plugin_init(ConfigCategory* config,
 void plugin_ingest(PLUGIN_HANDLE *handle,
 		   READINGSET *readingSet)
 {
-	RMSFilter *filter = (RMSFilter *)handle;
+	FILTER_INFO *info = (FILTER_INFO *) handle;
+	RMSFilter *filter = info->handle;
 	if (!filter->isEnabled())
 	{
 		// Current filter is not active: just pass the readings set
@@ -127,6 +136,15 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
 	delete (ReadingSet *)readingSet;
 
 	ReadingSet *newReadingSet = new ReadingSet(&out);
+	const vector<Reading *>& readings = newReadingSet->getAllReadings();
+	// Iterate over the readings
+	for (vector<Reading *>::const_iterator elem = readings.begin();
+						      elem != readings.end();
+						      ++elem)
+	{
+		AssetTracker::getAssetTracker()->addAssetTrackingTuple(info->configCatName, (*elem)->getAssetName(), string("Filter"));
+	}
+		
 	filter->m_func(filter->m_data, newReadingSet);
 }
 
@@ -138,8 +156,9 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
  */
 void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
 {
-	RMSFilter *data = (RMSFilter *)handle;
-	data->reconfigure(newConfig);
+	FILTER_INFO *info = (FILTER_INFO *)handle;
+	RMSFilter* data = info->handle;
+	data->setConfig(newConfig);
 }
 
 /**
@@ -147,8 +166,9 @@ void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
  */
 void plugin_shutdown(PLUGIN_HANDLE *handle)
 {
-	RMSFilter *data = (RMSFilter *)handle;
-	delete data;
+	FILTER_INFO *info = (FILTER_INFO *) handle;
+	delete info->handle;
+	delete info;
 }
 
 // End of extern "C"
