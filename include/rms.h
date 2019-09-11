@@ -1,5 +1,5 @@
 /*
- * FogLAMP "RMS" filter plugin.
+ * Fledge "RMS" filter plugin.
  *
  * Copyright (c) 2018 Dianomic Systems
  *
@@ -13,7 +13,7 @@
 #include <map>
 #include <regex>
 
-class RMSFilter : public FogLampFilter {
+class RMSFilter : public FledgeFilter {
 	public:
 		RMSFilter(const std::string& filterName,
 			ConfigCategory& filterConfig,
